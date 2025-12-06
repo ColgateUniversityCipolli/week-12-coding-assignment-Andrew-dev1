@@ -99,6 +99,10 @@ alternative.
   alternative hypothesis? 
 \begin{knitrout}\scriptsize
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hldef{n} \hlkwb{=}\hlnum{20}
+\hldef{(boundary.20} \hlkwb{<-} \hlkwd{qt}\hldef{(}\hlnum{1}\hlopt{-}\hlnum{0.05}\hldef{,}\hlkwc{df} \hldef{= n}\hlopt{-}\hlnum{1}\hldef{))}
+\end{alltt}
 \begin{verbatim}
 ## [1] 1.729133
 \end{verbatim}
@@ -108,6 +112,10 @@ alternative.
   alternative hypothesis?
 \begin{knitrout}\scriptsize
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hldef{n} \hlkwb{=}\hlnum{30}
+\hldef{(boundary.30} \hlkwb{<-} \hlkwd{qt}\hldef{(}\hlnum{1}\hlopt{-}\hlnum{0.05}\hldef{,}\hlkwc{df} \hldef{= n}\hlopt{-}\hlnum{1}\hldef{))}
+\end{alltt}
 \begin{verbatim}
 ## [1] 1.699127
 \end{verbatim}
@@ -120,8 +128,36 @@ alternative.
   package for \texttt{R} \citep{VGAM}.
 \begin{knitrout}\scriptsize
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hldef{R} \hlkwb{<-} \hlnum{10000}
+\hldef{alpha} \hlkwb{<-} \hlnum{0.05}
+\hldef{n}\hlkwb{<-} \hlnum{30}
+
+\hldef{error.counter} \hlkwb{<-} \hlnum{0}
+
+\hlkwa{for}\hldef{(i} \hlkwa{in} \hlnum{1}\hlopt{:}\hldef{R)\{}
+  \hldef{sample} \hlkwb{<-} \hlkwd{rlaplace}\hldef{(n,} \hlkwc{location}\hldef{=} \hlnum{0}\hldef{,} \hlkwc{scale} \hldef{=}\hlnum{4}\hldef{)}
+  \hldef{t.test20} \hlkwb{<-} \hlkwd{t.test}\hldef{(sample[}\hlnum{1}\hlopt{:}\hlnum{20}\hldef{],} \hlkwc{mu} \hldef{=} \hlnum{0}\hldef{)}
+  \hldef{t.20} \hlkwb{<-} \hldef{t.test20}\hlopt{$}\hldef{statistic}
+
+  \hldef{t.test.full} \hlkwb{<-} \hlkwd{t.test}\hldef{(sample,} \hlkwc{mu} \hldef{=} \hlnum{0}\hldef{)}
+  \hldef{t.30} \hlkwb{<-} \hldef{t.test.full}\hlopt{$}\hldef{statistic}
+
+  \hlcom{# reject null or not at month 20? }
+  \hlcom{# else check at month 30}
+  \hlkwa{if} \hldef{(t.20} \hlopt{>} \hldef{boundary.20) \{}
+    \hldef{error.counter} \hlkwb{<-} \hldef{error.counter} \hlopt{+} \hlnum{1}
+  \hldef{\}} \hlkwa{else if} \hldef{(t.30} \hlopt{>} \hldef{boundary.30) \{}
+    \hldef{error.counter} \hlkwb{<-} \hldef{error.counter} \hlopt{+} \hlnum{1}
+  \hldef{\}}
+
+\hldef{\}}
+
+\hlcom{# estimate type 1 error rate}
+\hldef{(t1.error.rate} \hlkwb{<-} \hldef{error.counter} \hlopt{/} \hldef{R)}
+\end{alltt}
 \begin{verbatim}
-## [1] 0.0708
+## [1] 0.0721
 \end{verbatim}
 \end{kframe}
 \end{knitrout}
@@ -139,7 +175,66 @@ alternative.
   and Beta(10,10) distributions and conduct the following hypothesis tests against 
   the actual mean for each case (e.g., $\frac{10}{10+2}$, $\frac{2}{10+2}$, and 
   $\frac{10}{10+10}$). 
+\begin{knitrout}\scriptsize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hldef{R} \hlkwb{<-} \hlnum{10000} \hlcom{# trials}
+\hldef{alpha} \hlkwb{<-} \hlnum{0.05} \hlcom{# significance level}
+\hldef{n} \hlkwb{=}\hlnum{15} \hlcom{# sample size}
 
+\hldef{real.mean10.2} \hlkwb{<-} \hlnum{10}\hlopt{/}\hldef{(}\hlnum{10}\hlopt{+}\hlnum{2}\hldef{)}
+\hldef{real.mean2.10} \hlkwb{<-} \hlnum{2}\hlopt{/}\hldef{(}\hlnum{10}\hlopt{+}\hlnum{2}\hldef{)}
+\hldef{real.mean10.10} \hlkwb{<-} \hlnum{10}\hlopt{/}\hldef{(}\hlnum{10}\hlopt{+}\hlnum{10}\hldef{)}
+
+\hldef{means} \hlkwb{<-} \hlkwd{c}\hldef{(real.mean10.2, real.mean2.10, real.mean10.10)}
+
+\hlcom{# each beta counter will track the left, right, and two tailed tests}
+\hldef{error.counter10.2} \hlkwb{<-} \hlkwd{c}\hldef{(}\hlnum{0}\hldef{,}\hlnum{0}\hldef{,}\hlnum{0}\hldef{)}
+\hldef{error.counter2.10} \hlkwb{<-} \hlkwd{c}\hldef{(}\hlnum{0}\hldef{,}\hlnum{0}\hldef{,}\hlnum{0}\hldef{)}
+\hldef{error.counter10.10} \hlkwb{<-} \hlkwd{c}\hldef{(}\hlnum{0}\hldef{,}\hlnum{0}\hldef{,}\hlnum{0}\hldef{)}
+
+\hlkwa{for}\hldef{(i} \hlkwa{in} \hlnum{1}\hlopt{:}\hldef{R)\{}
+  \hldef{sample.beta1} \hlkwb{<-} \hlkwd{rbeta}\hldef{(n,} \hlnum{10}\hldef{,} \hlnum{2}\hldef{)}
+  \hldef{sample.beta2} \hlkwb{<-} \hlkwd{rbeta}\hldef{(n,} \hlnum{2}\hldef{,} \hlnum{10}\hldef{)}
+  \hldef{sample.beta3} \hlkwb{<-} \hlkwd{rbeta}\hldef{(n,} \hlnum{10}\hldef{,} \hlnum{10}\hldef{)}
+
+  \hlcom{## Beta(10,2) tests }
+  \hldef{t.left1} \hlkwb{<-} \hlkwd{t.test}\hldef{(sample.beta1,} \hlkwc{mu}\hldef{= means[}\hlnum{1}\hldef{],} \hlkwc{alternative}\hldef{=}\hlsng{"less"}\hldef{)}
+  \hldef{t.right1} \hlkwb{<-} \hlkwd{t.test}\hldef{(sample.beta1,} \hlkwc{mu}\hldef{= means[}\hlnum{1}\hldef{],} \hlkwc{alternative}\hldef{=}\hlsng{"greater"}\hldef{)}
+  \hldef{t.both1} \hlkwb{<-} \hlkwd{t.test}\hldef{(sample.beta1,} \hlkwc{mu}\hldef{= means[}\hlnum{1}\hldef{],} \hlkwc{alternative}\hldef{=}\hlsng{"two.sided"}\hldef{)}
+
+  \hldef{error.counter10.2[}\hlnum{1}\hldef{]} \hlkwb{<-} \hldef{error.counter10.2[}\hlnum{1}\hldef{]} \hlopt{+} \hldef{(t.left1}\hlopt{$}\hldef{p.value} \hlopt{<} \hldef{alpha)}
+  \hldef{error.counter10.2[}\hlnum{2}\hldef{]} \hlkwb{<-} \hldef{error.counter10.2[}\hlnum{2}\hldef{]} \hlopt{+} \hldef{(t.right1}\hlopt{$}\hldef{p.value} \hlopt{<} \hldef{alpha)}
+  \hldef{error.counter10.2[}\hlnum{3}\hldef{]} \hlkwb{<-} \hldef{error.counter10.2[}\hlnum{3}\hldef{]} \hlopt{+} \hldef{(t.both1}\hlopt{$}\hldef{p.value} \hlopt{<} \hldef{alpha)}
+
+  \hlcom{## Beta(2,10) tests }
+  \hldef{t.left2} \hlkwb{<-} \hlkwd{t.test}\hldef{(sample.beta2,} \hlkwc{mu}\hldef{= means[}\hlnum{2}\hldef{],} \hlkwc{alternative}\hldef{=}\hlsng{"less"}\hldef{)}
+  \hldef{t.right2} \hlkwb{<-} \hlkwd{t.test}\hldef{(sample.beta2,} \hlkwc{mu}\hldef{= means[}\hlnum{2}\hldef{],} \hlkwc{alternative}\hldef{=}\hlsng{"greater"}\hldef{)}
+  \hldef{t.both2} \hlkwb{<-} \hlkwd{t.test}\hldef{(sample.beta2,} \hlkwc{mu}\hldef{= means[}\hlnum{2}\hldef{],} \hlkwc{alternative}\hldef{=}\hlsng{"two.sided"}\hldef{)}
+
+  \hldef{error.counter2.10[}\hlnum{1}\hldef{]} \hlkwb{<-} \hldef{error.counter2.10[}\hlnum{1}\hldef{]} \hlopt{+} \hldef{(t.left2}\hlopt{$}\hldef{p.value} \hlopt{<} \hldef{alpha)}
+  \hldef{error.counter2.10[}\hlnum{2}\hldef{]} \hlkwb{<-} \hldef{error.counter2.10[}\hlnum{2}\hldef{]} \hlopt{+} \hldef{(t.right2}\hlopt{$}\hldef{p.value} \hlopt{<} \hldef{alpha)}
+  \hldef{error.counter2.10[}\hlnum{3}\hldef{]} \hlkwb{<-} \hldef{error.counter2.10[}\hlnum{3}\hldef{]} \hlopt{+} \hldef{(t.both2}\hlopt{$}\hldef{p.value} \hlopt{<} \hldef{alpha)}
+
+  \hlcom{## Beta(10,10) tests }
+  \hldef{t.left3} \hlkwb{<-} \hlkwd{t.test}\hldef{(sample.beta3,} \hlkwc{mu}\hldef{= means[}\hlnum{3}\hldef{],} \hlkwc{alternative}\hldef{=}\hlsng{"less"}\hldef{)}
+  \hldef{t.right3} \hlkwb{<-} \hlkwd{t.test}\hldef{(sample.beta3,} \hlkwc{mu}\hldef{= means[}\hlnum{3}\hldef{],} \hlkwc{alternative}\hldef{=}\hlsng{"greater"}\hldef{)}
+  \hldef{t.both3} \hlkwb{<-} \hlkwd{t.test}\hldef{(sample.beta3,} \hlkwc{mu}\hldef{= means[}\hlnum{3}\hldef{],} \hlkwc{alternative}\hldef{=}\hlsng{"two.sided"}\hldef{)}
+
+  \hldef{error.counter10.10[}\hlnum{1}\hldef{]} \hlkwb{<-} \hldef{error.counter10.10[}\hlnum{1}\hldef{]} \hlopt{+} \hldef{(t.left3}\hlopt{$}\hldef{p.value} \hlopt{<} \hldef{alpha)}
+  \hldef{error.counter10.10[}\hlnum{2}\hldef{]} \hlkwb{<-} \hldef{error.counter10.10[}\hlnum{2}\hldef{]} \hlopt{+} \hldef{(t.right3}\hlopt{$}\hldef{p.value} \hlopt{<} \hldef{alpha)}
+  \hldef{error.counter10.10[}\hlnum{3}\hldef{]} \hlkwb{<-} \hldef{error.counter10.10[}\hlnum{3}\hldef{]} \hlopt{+} \hldef{(t.both3}\hlopt{$}\hldef{p.value} \hlopt{<} \hldef{alpha)}
+
+
+\hldef{\}}
+
+\hlcom{# Compute Type I error rates}
+\hldef{type1_error_rate_10_2} \hlkwb{<-} \hldef{error.counter10.2} \hlopt{/} \hldef{R}
+\hldef{type1_error_rate_2_10} \hlkwb{<-} \hldef{error.counter2.10} \hlopt{/} \hldef{R}
+\hldef{type1_error_rate_10_10} \hlkwb{<-} \hldef{error.counter10.10} \hlopt{/} \hldef{R}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
 
   \begin{enumerate}
     \item What proportion of the time do we make an error of Type I for a
@@ -147,7 +242,7 @@ alternative.
 \begin{knitrout}\scriptsize
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{verbatim}
-## [1] 0.0298 0.0816 0.0469
+## [1] 0.0275 0.0794 0.0465
 \end{verbatim}
 \end{kframe}
 \end{knitrout}
@@ -157,7 +252,7 @@ alternative.
 \begin{knitrout}\scriptsize
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{verbatim}
-## [1] 0.0788 0.0289 0.0507
+## [1] 0.0814 0.0269 0.0517
 \end{verbatim}
 \end{kframe}
 \end{knitrout}
@@ -167,7 +262,7 @@ alternative.
 \begin{knitrout}\scriptsize
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{verbatim}
-## [1] 0.0592 0.0617 0.0472
+## [1] 0.0605 0.0608 0.0506
 \end{verbatim}
 \end{kframe}
 \end{knitrout}

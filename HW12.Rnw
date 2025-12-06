@@ -51,14 +51,14 @@ alternative.
 \begin{enumerate}
   \item What values of $t_{20}$ provide statistically discernible support for the
   alternative hypothesis? 
-<<echo =F, size = 'scriptsize'>>=
+<<message =F, warning =F, size = 'scriptsize'>>=
 n =20
 (boundary.20 <- qt(1-0.05,df = n-1))
 
 @
   \item What values of $t_{30}$ provide statistically discernible support for the
   alternative hypothesis?
-<<echo =F, size = 'scriptsize'>>=
+<<message =F, warning =F, size = 'scriptsize'>>=
 n =30
 (boundary.30 <- qt(1-0.05,df = n-1))
 
@@ -68,7 +68,7 @@ n =30
   Conduct a simulation study to assess the Type I error rate of this approach.\\
   \textbf{Note:} You can use the \texttt{rlaplace()} function from the \texttt{VGAM}
   package for \texttt{R} \citep{VGAM}.
-<<echo =F, size = 'scriptsize'>>=
+<<message =F, warning =F, size = 'scriptsize'>>=
 R <- 10000
 alpha <- 0.05
 n<- 30
@@ -111,7 +111,7 @@ for(i in 1:R){
   and Beta(10,10) distributions and conduct the following hypothesis tests against 
   the actual mean for each case (e.g., $\frac{10}{10+2}$, $\frac{2}{10+2}$, and 
   $\frac{10}{10+10}$). 
-<<echo = F, size = 'scriptsize'>>=
+<<message =F, warning =F, size = 'scriptsize'>>=
 R <- 10000 # trials
 alpha <- 0.05 # significance level
 n =15 # sample size
